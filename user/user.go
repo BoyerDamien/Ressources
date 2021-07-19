@@ -6,9 +6,7 @@ import (
 
 	"github.com/BoyerDamien/gapi"
 	"github.com/BoyerDamien/gapi/database"
-	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 // User
@@ -20,11 +18,11 @@ type User struct {
 
 	// Nom de l'utilisateur
 	// required: true
-	FirstName string `json:"firstName"`
+	FirstName string `json:"first_name"`
 
 	// Prénom de l'utilisateur
 	// required: true
-	LastName string `json:"lastName"`
+	LastName string `json:"last_name"`
 
 	// Mot de passe de l'utilisateur
 	// required: true
@@ -112,7 +110,7 @@ func (s *User) AfterUpdate(tx *database.DB) (err error) {
 //     description: Erreur
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
-func (s *User) Retrieve(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
+func (s *User) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Email = ?", c.Params("id")).First(s), nil
 }
 
@@ -148,7 +146,7 @@ func (s *User) Retrieve(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 //     description: Erreur
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
-func (s *User) Update(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
+func (s *User) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	res := db.Model(s).Omit("Email", "Role", "Password").Updates(s)
 	if res.Error != nil {
 		return res, nil
@@ -188,7 +186,7 @@ func (s *User) Update(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 //     description: Erreur
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
-func (s *User) Create(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
+func (s *User) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	if s.Password == "" {
 		return db, fmt.Errorf("no password")
 	}
@@ -223,7 +221,7 @@ func (s *User) Create(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 //     description: Erreur
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
-func (s *User) Delete(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
+func (s *User) Delete(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Email = ?", c.Params("id")).Delete(s), nil
 }
 
