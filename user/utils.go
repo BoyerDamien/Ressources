@@ -86,6 +86,22 @@ func (s *testApi) Retrieve(endpoint string, result interface{}) (*http.Response,
 	return resp, nil
 }
 
+func (s *testApi) Delete(endpoint string, result interface{}) (*http.Response, error) {
+	req := httptest.NewRequest("DELETE", endpoint, nil)
+
+	resp, err := s.App.Test(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		return resp, nil
+	}
+	if err = s.ReadData(resp, result); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 func SetupApp(url string) *gapi.App {
 	os.Remove("test.db")
 	app := gapi.New(sqlite.Open("test.db"), gapi.Config{})

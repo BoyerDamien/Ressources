@@ -96,7 +96,7 @@ func (s *User) Create(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 }
 
 func (s *User) Delete(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
-	return db.Where("Email = ?", s.Email).Delete(s), nil
+	return db.Where("Email = ?", c.Params("id")).Delete(s), nil
 }
 
 func (s *User) DeleteListQuery() gapi.Query {
@@ -109,8 +109,8 @@ func (s *User) ListQuery() gapi.Query {
 
 type UserListQuery struct {
 	ToFind  string `query:"tofind"`
-	Role    string `query:"role" validate:"omitempty,eq=admin|eq=customer"`
-	OrderBy string `query:"orderBy" validate:"omitempty,eq=created_at|eq=updated_at|eq=firstName|eq=lastName|eq=age|eq=address"`
+	Role    string `query:"role" validate:"omitempty,eq=admin|eq=customer|eq=user"`
+	OrderBy string `query:"orderBy" validate:"omitempty,eq=created_at|eq=updated_at|eq=first_name|eq=last_name|eq=age|eq=address|eq=email"`
 	Limit   int    `query:"limit" validate:"omitempty,gte=0"`
 	Offset  int    `query:"offset" validate:"omitempty,gte=0"`
 }
@@ -118,7 +118,7 @@ type UserListQuery struct {
 func (s *UserListQuery) Run(c *gapi.Ctx, db *database.DB) (*database.DB, interface{}) {
 
 	users := new([]User)
-	tmp := db
+	tmp := db.Model(&User{})
 
 	if s.Limit > 0 {
 		tmp = tmp.Limit(s.Limit)
@@ -127,7 +127,7 @@ func (s *UserListQuery) Run(c *gapi.Ctx, db *database.DB) (*database.DB, interfa
 		tmp = tmp.Offset(s.Offset)
 	}
 	if len(s.ToFind) > 0 {
-		tmp = tmp.Where("FirstName LIKE ?", "%"+s.ToFind+"%").Or("LastName LIKE ?", "%"+s.ToFind+"%").Or("Email LIKE ?", "%"+s.ToFind+"%")
+		tmp = tmp.Where("Email LIKE ?", "%"+s.ToFind+"%").Or("first_name LIKE ?", "%"+s.ToFind+"%").Or("last_name LIKE ?", "%"+s.ToFind+"%")
 	}
 	if len(s.Role) > 0 {
 		tmp = tmp.Where("Role = ?", s.Role)
@@ -146,7 +146,7 @@ type UserDeleteQuery struct {
 func (s *UserDeleteQuery) Run(c *gapi.Ctx, db *database.DB) (*database.DB, interface{}) {
 	var users []User
 
-	if result := db.Where("Emails IN ?", s.Emails).Find(&users); result.Error != nil {
+	if result := db.Where("Email IN ?", s.Emails).Find(&users); result.Error != nil {
 		return result, nil
 	}
 	return db.Delete(&users, s.Emails), nil
