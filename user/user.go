@@ -47,7 +47,7 @@ type User struct {
 	Phone string `json:"phone"`
 
 	// Role de l'utilisateur
-	// pattern: " customer | admin"
+	// pattern: " customer | admin | user"
 	// required: true
 	Role string `json:"role" validate:"required,eq=admin|eq=customer|eq=user"`
 }
@@ -76,10 +76,76 @@ func (s *User) AfterUpdate(tx *database.DB) (err error) {
 	return
 }
 
+// swagger:operation GET /user/{id} User Retrieve
+//
+// Retourne des informations détaillées sur un utilisateur
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: id
+//   in: path
+//   description: l'email de l'utilisateur
+//   required: true
+//   type: string
+// responses:
+//   '200':
+//     description: Retourne un utilisateur
+//     schema:
+//         "$ref": "#/definitions/User"
+//   '404':
+//     description: StatusNotFound
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *User) Retrieve(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 	return db.Where("Email = ?", c.Params("id")).First(s), nil
 }
 
+// swagger:operation PUT /user User Update
+//
+// Modifie un utilisateur existant
+//
+// ---
+// produces:
+// - application/json
+// consume:
+// - application/json
+// parameters:
+// - name: user
+//   in: body
+//   description: Données de l'utilisateur
+//   schema:
+//       "$ref": "#/definitions/User"
+// responses:
+//   '200':
+//     description: Retourne l'utilisateur modifié
+//     schema:
+//         "$ref": "#/definitions/User"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *User) Update(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 	res := db.Model(s).Omit("Email", "Role", "Password").Updates(s)
 	if res.Error != nil {
@@ -88,6 +154,38 @@ func (s *User) Update(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 	return db.Where("Email = ?", s.Email).First(s), nil
 }
 
+// swagger:operation POST /user User Create
+//
+// Créé un nouvel utilisateur
+//
+// ---
+// produces:
+// - application/json
+// consumes:
+// - application/json
+// parameters:
+// - name: user
+//   in: body
+//   description: Données de l'utilisateur
+//   schema:
+//       "$ref": "#/definitions/User"
+// responses:
+//   '200':
+//     description: Retourne l'utilisateur créé
+//     schema:
+//         "$ref": "#/definitions/User"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *User) Create(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 	if len(s.Password) == 0 {
 		return db, fmt.Errorf("no password")
@@ -95,14 +193,126 @@ func (s *User) Create(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 	return db.FirstOrCreate(s, s), nil
 }
 
+// swagger:operation DELETE /user/{id} User Delete
+//
+// Supprime un utilisateur existant
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: id
+//   in: path
+//   description: email de l'utilisateur
+//   required: true
+//   type: string
+// responses:
+//   '200':
+//     description: Valide la suppression
+//   '202':
+//     description: StatusAccepted
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *User) Delete(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 	return db.Where("Email = ?", c.Params("id")).Delete(s), nil
 }
 
+// swagger:operation DELETE /users User DeleteListQuery
+//
+// Supprime une liste d'utilisateurs
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: emails
+//   in: query
+//   description: Liste de mails
+//   required: true
+//   type: array
+//   items:
+//       type: string
+// responses:
+//   '200':
+//     description: Valide la suppression
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '202':
+//     description: StatusAccepted
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *User) DeleteListQuery() gapi.Query {
 	return &UserDeleteQuery{}
 }
 
+// swagger:operation GET /users User ListQuery
+//
+// Retourne des informations détaillées sur une liste d'utilisateurs
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: role
+//   in: query
+//   description: Permet le filtre par role
+//   required: false
+//   type: string
+//   pattern: " user | admin | customer"
+// - name: orderBy
+//   description: Permet de trier les résultats par champs
+//   pattern: " first_name | last_name | age | adress | email | created_at | updated_at"
+//   type: string
+//   in: query
+//   required: false
+// - name: limit
+//   description: Limite le nombre de résultats au nombre passé en paramètre
+//   type: number
+//   in: query
+// - name: offset
+//   description: Filtre les résultats a partir de l'index passé en paramètre
+//   type: number
+//   in: query
+// responses:
+//   '200':
+//     description: Retourne une liste d'utilisateurs
+//     schema:
+//       type: array
+//       items:
+//         "$ref": "#/definitions/User"
+//   '404':
+//     description: StatusNotFound
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *User) ListQuery() gapi.Query {
 	return &UserListQuery{}
 }
