@@ -32,6 +32,8 @@ type User struct {
 
 	// Age de l'utilisateur
 	// required: false
+	// min: 0
+	// max: 130
 	Age uint8 `json:"age" validate:"gte=0,lte=130"`
 
 	// Email de l'utilisateur
