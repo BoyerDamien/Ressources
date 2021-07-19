@@ -89,7 +89,7 @@ func (s *User) Update(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
 }
 
 func (s *User) Create(c *fiber.Ctx, db *gorm.DB) (*gorm.DB, error) {
-	if len(s.Password) == 0 {
+	if s.Password == "" {
 		return db, fmt.Errorf("no password")
 	}
 	return db.FirstOrCreate(s, s), nil
