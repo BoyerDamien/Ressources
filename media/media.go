@@ -48,7 +48,8 @@ type Media struct {
 }
 
 func (s *Media) AfterDelete(tx *database.DB) (err error) {
-	return os.Remove(s.Path)
+	os.Remove(s.Path)
+	return
 }
 
 func (s *Media) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
