@@ -78,7 +78,6 @@ func Test_POST_Media(t *testing.T) {
 		Url:    "testFile.txt",
 		Status: "protected",
 	}
-	defer os.Remove(data.Name)
 
 	var result Media
 	resp, err := tester.Create(urlOne, "../testFile.txt", &result)
@@ -94,4 +93,84 @@ func Test_POST_Media(t *testing.T) {
 
 	_, err = os.Stat("testFile.txt")
 	utils.AssertEqual(t, false, os.IsNotExist(err), "Exist test")
+}
+
+/*****************************************************************************
+ *					Test retrieve routes
+ ****************************************************************************/
+func Test_GET_Media(t *testing.T) {
+	data := Media{
+		Name:   "testFile.txt",
+		Size:   12,
+		Type:   "application/octet-stream",
+		Url:    "testFile.txt",
+		Status: "protected",
+	}
+
+	tester.Create(urlOne, "../testFile.txt", nil)
+
+	var result Media
+	resp, err := tester.Retrieve(urlOne+"/testFile.txt", &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+
+	resp, err = app.Test(httptest.NewRequest("GET", "/static/testFile.txt", nil))
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+}
+
+/*****************************************************************************
+ *					Test Update Routes
+ ****************************************************************************/
+func Test_PUT_Media(t *testing.T) {
+	data := Media{
+		Name:   "testFile.txt",
+		Size:   12,
+		Type:   "application/octet-stream",
+		Url:    "testFile.txt",
+		Status: "protected",
+	}
+	tester.Create(urlOne, "../testFile.txt", nil)
+	data.Status = "open"
+
+	var result Media
+	resp, err := tester.Update(urlOne, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+
+	var result2 Media
+	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+}
+
+func Test_PUT_Media_Wrong_Status(t *testing.T) {
+	data := Media{
+		Name:   "testFile.txt",
+		Size:   12,
+		Type:   "application/octet-stream",
+		Url:    "testFile.txt",
+		Status: "protected",
+	}
+	tester.Create(urlOne, "../testFile.txt", nil)
+	data.Status = "fergrt"
+
+	var result Media
+	resp, err := tester.Update(urlOne, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+
+	var result2 Media
+	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+
 }

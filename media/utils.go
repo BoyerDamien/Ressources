@@ -115,6 +115,7 @@ func SetupApp(url string) *gapi.App {
 	app := gapi.New(sqlite.Open("test.db"), gapi.Config{})
 	api := app.Collection(url)
 	api.AddRessources(&Media{})
+	app.Static("/static", ".")
 	return app
 }
 
