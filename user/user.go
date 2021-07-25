@@ -76,7 +76,7 @@ func (s *User) AfterUpdate(tx *database.DB) (err error) {
 	return
 }
 
-// swagger:operation GET /user/{id} User Retrieve
+// swagger:operation GET /user/{id} User RetrieveUser
 //
 // Retourne des informations détaillées sur un utilisateur
 //
@@ -154,7 +154,7 @@ func (s *User) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Email = ?", s.Email).First(s), nil
 }
 
-// swagger:operation POST /user User Create
+// swagger:operation POST /user User CreateUser
 //
 // Créé un nouvel utilisateur
 //
@@ -193,7 +193,7 @@ func (s *User) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.FirstOrCreate(s, s), nil
 }
 
-// swagger:operation DELETE /user/{id} User Delete
+// swagger:operation DELETE /user/{id} User DeleteUser
 //
 // Supprime un utilisateur existant
 //
@@ -225,7 +225,7 @@ func (s *User) Delete(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Email = ?", c.Params("id")).Delete(s), nil
 }
 
-// swagger:operation DELETE /users User DeleteListQuery
+// swagger:operation DELETE /users User DeleteUserList
 //
 // Supprime une liste d'utilisateurs
 //
@@ -263,7 +263,7 @@ func (s *User) DeleteListQuery() gapi.Query {
 	return &UserDeleteQuery{}
 }
 
-// swagger:operation GET /users User ListQuery
+// swagger:operation GET /users User UserList
 //
 // Retourne des informations détaillées sur une liste d'utilisateurs
 // ---

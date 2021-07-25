@@ -59,10 +59,76 @@ func (s *Media) BeforeFind(tx *database.DB) (err error) {
 	return
 }
 
+// swagger:operation GET /media/{id} Media RetrieveMedia
+//
+// Retourne des informations détaillées sur un média
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: id
+//   in: path
+//   description: le nom du média
+//   required: true
+//   type: string
+// responses:
+//   '200':
+//     description: Retourne un média
+//     schema:
+//         "$ref": "#/definitions/Media"
+//   '404':
+//     description: StatusNotFound
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Media) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Name = ?", c.Params("id")).First(s), nil
 }
 
+// swagger:operation PUT /media Media UpdateMedia
+//
+// Modifie un média existant
+//
+// ---
+// produces:
+// - application/json
+// consume:
+// - application/json
+// parameters:
+// - name: media
+//   in: body
+//   description: Données du média
+//   schema:
+//       "$ref": "#/definitions/Media"
+// responses:
+//   '200':
+//     description: Retourne le média modifié
+//     schema:
+//         "$ref": "#/definitions/Media"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Media) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	if s.Status == "open" || s.Status == "protected" {
 		if res := db.Model(s).Select("Status").Updates(s); res.Error != nil {
@@ -73,6 +139,37 @@ func (s *Media) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return nil, fmt.Errorf("wrong status")
 }
 
+// swagger:operation POST /media Media CreateMedia
+//
+// Créé un nouveau média
+//
+// ---
+// produces:
+// - application/json
+// consumes:
+// - application/json
+// parameters:
+// - name: media
+//   in: formData
+//   description: Contenu du média
+//   type: file
+// responses:
+//   '200':
+//     description: Retourne le média créé
+//     schema:
+//         "$ref": "#/definitions/Media"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Media) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	media, err := c.FormFile("media")
 	if err != nil {
@@ -97,14 +194,131 @@ func (s *Media) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return result, nil
 }
 
+// swagger:operation DELETE /media/{id} Media DeleteMedia
+//
+// Supprime un média existant
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: id
+//   in: path
+//   description: nom du média
+//   required: true
+//   type: string
+// responses:
+//   '200':
+//     description: Valide la suppression
+//   '202':
+//     description: StatusAccepted
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//
 func (s *Media) Delete(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Name = ?", c.Params("id")).Delete(s), nil
 }
 
+// swagger:operation DELETE /medias Media DeleteMediaList
+//
+// Supprime une liste de médias
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: names
+//   in: query
+//   description: Liste de noms
+//   required: true
+//   type: array
+//   items:
+//       type: string
+// responses:
+//   '200':
+//     description: Valide la suppression
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '202':
+//     description: StatusAccepted
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Media) DeleteListQuery() gapi.Query {
 	return &MediaDeleteQuery{}
 }
 
+// swagger:operation GET /medias Media MediaList
+//
+// Retourne des informations détaillées sur une liste de médias
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: status
+//   in: query
+//   description: Permet le filtre par status
+//   required: false
+//   type: string
+//   pattern: " protected | open"
+// - name: type
+//   in: query
+//   description: Permet le filtre par mime type
+//   required: false
+//   type: string
+// - name: orderBy
+//   description: Permet de trier les résultats par champs
+//   pattern: " name | created_at | updated_at | size"
+//   type: string
+//   in: query
+//   required: false
+// - name: limit
+//   description: Limite le nombre de résultats au nombre passé en paramètre
+//   type: number
+//   in: query
+// - name: offset
+//   description: Filtre les résultats a partir de l'index passé en paramètre
+//   type: number
+//   in: query
+// responses:
+//   '200':
+//     description: Retourne une liste de médias
+//     schema:
+//       type: array
+//       items:
+//         "$ref": "#/definitions/User"
+//   '404':
+//     description: StatusNotFound
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Media) ListQuery() gapi.Query {
 	return &MediaListQuery{}
 }
