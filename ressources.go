@@ -1,7 +1,7 @@
 // Ressources API
 //
-// Ce package centralise de multiples modules de ressource d'API
-// Toutes les ressources impémentent tout ou partiellement l'interface "Ressource" du framework Gapi
+// Ce package centralise de multiples modules de ressource d'API.
+// Toutes les ressources impémentent entièrement ou partiellement l'interface "Ressource" du framework Gapi.
 // Le but de ce package est des fournir des ressources d'API typiques déja documentées et testées.
 // Toutes ces ressources peuvent être utilisées dans le framework Gapi par un simple import.
 //
