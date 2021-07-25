@@ -63,7 +63,6 @@ func (s *Media) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 		}
 		return db.Where("Name = ?", s.Name).First(s), nil
 	}
-	fmt.Println("okok")
 	return nil, fmt.Errorf("wrong status")
 }
 

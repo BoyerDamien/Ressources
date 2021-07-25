@@ -155,7 +155,7 @@ func Test_PUT_Media_Wrong_Status(t *testing.T) {
 		Size:   12,
 		Type:   "application/octet-stream",
 		Url:    "testFile.txt",
-		Status: "protected",
+		Status: "open",
 	}
 	tester.Create(urlOne, "../testFile.txt", nil)
 	data.Status = "fergrt"
@@ -167,7 +167,7 @@ func Test_PUT_Media_Wrong_Status(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(&Media{}), ModelToString(result), "Value")
 
-	data.Status = "protected"
+	data.Status = "open"
 	var result2 Media
 	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
