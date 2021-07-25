@@ -173,5 +173,21 @@ func Test_PUT_Media_Wrong_Status(t *testing.T) {
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value2")
+}
 
+/*****************************************************************************
+ *					Test Delete Routes
+ ****************************************************************************/
+func Test_DELETE_Media(t *testing.T) {
+	tester.Create(urlOne, "../testFile.txt", nil)
+
+	resp, err := app.Test(httptest.NewRequest("DELETE", fmt.Sprintf("%s/testFile.txt", urlOne), nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	var result2 Media
+	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
 }
