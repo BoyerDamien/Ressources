@@ -106,7 +106,7 @@ type MediaListQuery struct {
 	ToFind  string `query:"tofind" validate:"omitempty"`
 	Type    string `query:"type" validate:"omitempty"`
 	Status  string `query:"status" validate:"omitempty,eq=protected|eq=open"`
-	OrderBy string `query:"orderBy" validate:"omitempty,eq=created_at|eq=updated_at|eq=firstName|eq=name|eq=size"`
+	OrderBy string `query:"orderBy" validate:"omitempty,eq=created_at|eq=updated_at|eq=name|eq=size"`
 	Limit   int    `query:"limit" validate:"omitempty,gte=0"`
 	Offset  int    `query:"offset" validate:"omitempty,gte=0"`
 }

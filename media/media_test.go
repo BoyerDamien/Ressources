@@ -147,6 +147,8 @@ func Test_PUT_Media(t *testing.T) {
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	data.Status = "protected"
+	tester.Update(urlOne, &data, &result)
 }
 
 func Test_PUT_Media_Wrong_Status(t *testing.T) {
@@ -155,7 +157,7 @@ func Test_PUT_Media_Wrong_Status(t *testing.T) {
 		Size:   12,
 		Type:   "application/octet-stream",
 		Url:    "testFile.txt",
-		Status: "open",
+		Status: "protected",
 	}
 	tester.Create(urlOne, "../testFile.txt", nil)
 	data.Status = "fergrt"
@@ -167,7 +169,7 @@ func Test_PUT_Media_Wrong_Status(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(&Media{}), ModelToString(result), "Value")
 
-	data.Status = "open"
+	data.Status = "protected"
 	var result2 Media
 	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
@@ -190,4 +192,72 @@ func Test_DELETE_Media(t *testing.T) {
 	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
+}
+
+/*****************************************************************************
+ *					Test GET list Routes
+ ****************************************************************************/
+func Test_GET_Media_List(t *testing.T) {
+	data := []Media{
+		{
+			Name:   "testFile.txt",
+			Size:   12,
+			Type:   "application/octet-stream",
+			Url:    "testFile.txt",
+			Status: "open",
+		},
+		{
+			Name:   "testFile2.json",
+			Size:   14,
+			Type:   "application/octet-stream",
+			Url:    "testFile2.txt",
+			Status: "protected",
+		},
+		{
+			Name:   "testFile3.txt",
+			Size:   14,
+			Type:   "application/octet-stream",
+			Url:    "testFile3.txt",
+			Status: "protected",
+		},
+		{
+			Name:   "testFile4.txt",
+			Size:   7,
+			Type:   "application/octet-stream",
+			Url:    "testFile4.txt",
+			Status: "open",
+		},
+	}
+	for _, val := range data {
+		tester.Create(urlOne, "../"+val.Name, nil)
+	}
+
+	tester.Update(urlOne, &data[0], nil)
+	tester.Update(urlOne, &data[3], nil)
+
+	var all []Media
+	resp, err := tester.Retrieve(urlList+"?orderBy=size", &all)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, len(data), len(all))
+	utils.AssertEqual(t, "testFile4.txt", all[0].Name)
+	utils.AssertEqual(t, "testFile.txt", all[1].Name)
+
+	var protected []Media
+	resp, err = tester.Retrieve(urlList+"?status=open", &protected)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 2, len(protected))
+
+	var found []Media
+	resp, err = tester.Retrieve(urlList+"?tofind=json", &found)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 1, len(found), "Size")
+
+	var limit []Media
+	resp, err = tester.Retrieve(urlList+"?limit=2&offset=3", &limit)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 1, len(limit), "Size")
 }
