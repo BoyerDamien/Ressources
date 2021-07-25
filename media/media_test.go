@@ -201,30 +201,18 @@ func Test_GET_Media_List(t *testing.T) {
 	data := []Media{
 		{
 			Name:   "testFile.txt",
-			Size:   12,
-			Type:   "application/octet-stream",
-			Url:    "testFile.txt",
 			Status: "open",
 		},
 		{
 			Name:   "testFile2.json",
-			Size:   14,
-			Type:   "application/octet-stream",
-			Url:    "testFile2.txt",
 			Status: "protected",
 		},
 		{
 			Name:   "testFile3.txt",
-			Size:   14,
-			Type:   "application/octet-stream",
-			Url:    "testFile3.txt",
 			Status: "protected",
 		},
 		{
 			Name:   "testFile4.txt",
-			Size:   7,
-			Type:   "application/octet-stream",
-			Url:    "testFile4.txt",
 			Status: "open",
 		},
 	}
@@ -260,4 +248,45 @@ func Test_GET_Media_List(t *testing.T) {
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, 1, len(limit), "Size")
+}
+
+/*****************************************************************************
+ *					Test Delete list Routes
+ ****************************************************************************/
+func Test_DELETE_Media_List(t *testing.T) {
+	data := []Media{
+		{
+			Name:   "testFile.txt",
+			Status: "open",
+		},
+		{
+			Name:   "testFile2.json",
+			Status: "protected",
+		},
+		{
+			Name:   "testFile3.txt",
+			Status: "protected",
+		},
+		{
+			Name:   "testFile4.txt",
+			Status: "open",
+		},
+	}
+	endpoint := urlList + "?Names="
+	for _, val := range data {
+		tester.Create(urlOne, "../"+val.Name, nil)
+		endpoint += val.Name + ","
+	}
+
+	endpoint = endpoint[:len(endpoint)-1]
+	resp, err := app.Test(httptest.NewRequest("DELETE", endpoint, nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	var result2 []Media
+	resp, err = tester.Retrieve(urlList, &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 0, len(result2), "Size")
 }

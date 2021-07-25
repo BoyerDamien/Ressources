@@ -52,6 +52,13 @@ func (s *Media) AfterDelete(tx *database.DB) (err error) {
 	return
 }
 
+func (s *Media) BeforeFind(tx *database.DB) (err error) {
+	if _, err := os.Stat(s.Path); os.IsNotExist(err) {
+		return fmt.Errorf("no such file or directory")
+	}
+	return
+}
+
 func (s *Media) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Name = ?", c.Params("id")).First(s), nil
 }
