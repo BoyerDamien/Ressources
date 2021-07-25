@@ -165,12 +165,13 @@ func Test_PUT_Media_Wrong_Status(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, ModelToString(&Media{}), ModelToString(result), "Value")
 
+	data.Status = "protected"
 	var result2 Media
 	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value2")
 
 }

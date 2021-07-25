@@ -58,8 +58,12 @@ func (s *Media) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 
 func (s *Media) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	if s.Status == "open" || s.Status == "protected" {
-		return db.Model(s).Select("Status").Updates(s), nil
+		if res := db.Model(s).Select("Status").Updates(s); res.Error != nil {
+			return db, nil
+		}
+		return db.Where("Name = ?", s.Name).First(s), nil
 	}
+	fmt.Println("okok")
 	return nil, fmt.Errorf("wrong status")
 }
 
