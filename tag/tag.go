@@ -21,22 +21,199 @@ type Tag struct {
 	Name string `json:"name" validate:"required,min=3,max=255" gorm:"primaryKey"`
 }
 
+// swagger:operation GET /tag/{id} Tag RetrieveTag
+//
+// Retourne des informations détaillées sur un tag
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: id
+//   in: path
+//   description: nom du tag
+//   required: true
+//   type: string
+// responses:
+//   '200':
+//     description: Retourne un tag
+//     schema:
+//         "$ref": "#/definitions/Tag"
+//   '404':
+//     description: StatusNotFound
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Tag) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Name = ?", c.Params("id")).First(s), nil
 }
 
+// swagger:operation POST /tag Tag CreateTag
+//
+// Créé un nouveau tag
+//
+// ---
+// produces:
+// - application/json
+// consumes:
+// - application/json
+// parameters:
+// - name: tag
+//   in: body
+//   description: Données du tag
+//   schema:
+//       "$ref": "#/definitions/Tag"
+// responses:
+//   '200':
+//     description: Retourne le tag
+//     schema:
+//         "$ref": "#/definitions/Tag"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Tag) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.FirstOrCreate(s, s), nil
 }
 
+// swagger:operation DELETE /tag/{id} Tag DeleteTag
+//
+// Supprime un tag existant
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: id
+//   in: path
+//   description: nom tu tag
+//   required: true
+//   type: string
+// responses:
+//   '200':
+//     description: Valide la suppression
+//   '202':
+//     description: StatusAccepted
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Tag) Delete(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Name = ?", c.Params("id")).Delete(s), nil
 }
 
+// swagger:operation DELETE /tags Tag DeleteTagList
+//
+// Supprime une liste de tags
+//
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: names
+//   in: query
+//   description: Liste de noms
+//   required: true
+//   type: array
+//   items:
+//       type: string
+// responses:
+//   '200':
+//     description: Valide la suppression
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '202':
+//     description: StatusAccepted
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Tag) DeleteListQuery() gapi.Query {
 	return &TagDeleteQuery{}
 }
 
+// swagger:operation GET /tags Tag TagList
+//
+// Retourne des informations détaillées sur une liste de tags
+// ---
+// produces:
+// - application/json
+// parameters:
+// - name: toFind
+//   in: query
+//   description: Permet le filtre par nom. Retourne les tags pour lesquels le nom contient la chaîne de caractères à rechercher
+//   required: false
+//   type: string
+// - name: orderBy
+//   description: Permet de trier les résultats par champs
+//   pattern: " name | created_at | updated_at"
+//   type: string
+//   in: query
+//   required: false
+// - name: limit
+//   description: Limite le nombre de résultats au nombre passé en paramètre
+//   type: number
+//   in: query
+// - name: offset
+//   description: Filtre les résultats a partir de l'index passé en paramètre
+//   type: number
+//   in: query
+// responses:
+//   '200':
+//     description: Retourne une liste de tags
+//     schema:
+//       type: array
+//       items:
+//         "$ref": "#/definitions/Tag"
+//   '404':
+//     description: StatusNotFound
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '400':
+//     description: StatusBadRequest
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   '500':
+//     description: StatusInternalServerError
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
+//   default:
+//     description: Erreur
+//     schema:
+//       "$ref": "#/definitions/ErrResponse"
 func (s *Tag) ListQuery() gapi.Query {
 	return &TagListQuery{}
 }

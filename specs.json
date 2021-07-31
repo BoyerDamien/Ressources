@@ -11,7 +11,7 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Ce package centralise de multiples modules de ressource d'API\nToutes les ressources impémentent tout ou partiellement l'interface \"Ressource\" du framework Gapi\nLe but de ce package est des fournir des ressources d'API typiques déja documentées et testées.\nToutes ces ressources peuvent être utilisées dans le framework Gapi par un simple import.\n\nFramework Gapi: https://github.com/BoyerDamien/gapi",
+    "description": "Ce package centralise de multiples modules de ressource d'API.\nToutes les ressources impémentent entièrement ou partiellement l'interface \"Ressource\" du framework Gapi.\nLe but de ce package est des fournir des ressources d'API typiques déja documentées et testées.\nToutes ces ressources peuvent être utilisées dans le framework Gapi par un simple import.\n\nFramework Gapi: https://github.com/BoyerDamien/gapi",
     "title": "Ressources API",
     "contact": {
       "email": "damienboyer45@gmail.com"
@@ -300,6 +300,277 @@
           "Media"
         ],
         "operationId": "DeleteMediaList",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Liste de noms",
+            "name": "names",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Valide la suppression"
+          },
+          "202": {
+            "description": "StatusAccepted",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "400": {
+            "description": "StatusBadRequest",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "500": {
+            "description": "StatusInternalServerError",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "default": {
+            "description": "Erreur",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          }
+        }
+      }
+    },
+    "/tag": {
+      "post": {
+        "description": "Créé un nouveau tag",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "CreateTag",
+        "parameters": [
+          {
+            "description": "Données du tag",
+            "name": "tag",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retourne le tag",
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
+          },
+          "400": {
+            "description": "StatusBadRequest",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "500": {
+            "description": "StatusInternalServerError",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "default": {
+            "description": "Erreur",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          }
+        }
+      }
+    },
+    "/tag/{id}": {
+      "get": {
+        "description": "Retourne des informations détaillées sur un tag",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "RetrieveTag",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "nom du tag",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retourne un tag",
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
+          },
+          "400": {
+            "description": "StatusBadRequest",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "404": {
+            "description": "StatusNotFound",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "500": {
+            "description": "StatusInternalServerError",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "default": {
+            "description": "Erreur",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Supprime un tag existant",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "DeleteTag",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "nom tu tag",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Valide la suppression"
+          },
+          "202": {
+            "description": "StatusAccepted",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "500": {
+            "description": "StatusInternalServerError",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "default": {
+            "description": "Erreur",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "description": "Retourne des informations détaillées sur une liste de tags",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "TagList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Permet le filtre par nom. Retourne les tags pour lesquels le nom contient la chaîne de caractères à rechercher",
+            "name": "toFind",
+            "in": "query"
+          },
+          {
+            "pattern": " name | created_at | updated_at",
+            "type": "string",
+            "description": "Permet de trier les résultats par champs",
+            "name": "orderBy",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "description": "Limite le nombre de résultats au nombre passé en paramètre",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "description": "Filtre les résultats a partir de l'index passé en paramètre",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retourne une liste de tags",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Tag"
+              }
+            }
+          },
+          "400": {
+            "description": "StatusBadRequest",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "404": {
+            "description": "StatusNotFound",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "500": {
+            "description": "StatusInternalServerError",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          },
+          "default": {
+            "description": "Erreur",
+            "schema": {
+              "$ref": "#/definitions/ErrResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Supprime une liste de tags",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "DeleteTagList",
         "parameters": [
           {
             "type": "array",
@@ -724,6 +995,22 @@
         }
       },
       "x-go-package": "github.com/BoyerDamien/ressources/media"
+    },
+    "Tag": {
+      "description": "Tag",
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "description": "Nom du Tag",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "#python"
+        }
+      },
+      "x-go-package": "github.com/BoyerDamien/ressources/tag"
     },
     "User": {
       "description": "User",

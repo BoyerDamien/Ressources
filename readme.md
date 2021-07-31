@@ -2,8 +2,8 @@
 
 
 # Ressources API
-Ce package centralise de multiples modules de ressource d'API
-Toutes les ressources impémentent tout ou partiellement l'interface "Ressource" du framework Gapi
+Ce package centralise de multiples modules de ressource d'API.
+Toutes les ressources impémentent entièrement ou partiellement l'interface "Ressource" du framework Gapi.
 Le but de ce package est des fournir des ressources d'API typiques déja documentées et testées.
 Toutes ces ressources peuvent être utilisées dans le framework Gapi par un simple import.
 
@@ -48,6 +48,18 @@ Framework Gapi: https://github.com/BoyerDamien/gapi
 | GET | /api/v1/medias | [media list](#media-list) |  |
 | GET | /api/v1/media/{id} | [retrieve media](#retrieve-media) |  |
 | PUT | /api/v1/media | [update media](#update-media) |  |
+  
+
+
+###  tag
+
+| Method  | URI     | Name   | Summary |
+|---------|---------|--------|---------|
+| POST | /api/v1/tag | [create tag](#create-tag) |  |
+| DELETE | /api/v1/tag/{id} | [delete tag](#delete-tag) |  |
+| DELETE | /api/v1/tags | [delete tag list](#delete-tag-list) |  |
+| GET | /api/v1/tag/{id} | [retrieve tag](#retrieve-tag) |  |
+| GET | /api/v1/tags | [tag list](#tag-list) |  |
   
 
 
@@ -128,6 +140,73 @@ Status: Internal Server Error
 Erreur
 
 ###### <span id="create-media-default-schema"></span> Schema
+
+  
+
+[ErrResponse](#err-response)
+
+### <span id="create-tag"></span> create tag (*CreateTag*)
+
+```
+POST /api/v1/tag
+```
+
+Créé un nouveau tag
+
+#### Consumes
+  * application/json
+
+#### Produces
+  * application/json
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| tag | `body` | [Tag](#tag) | `models.Tag` | |  | | Données du tag |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#create-tag-200) | OK | Retourne le tag |  | [schema](#create-tag-200-schema) |
+| [400](#create-tag-400) | Bad Request | StatusBadRequest |  | [schema](#create-tag-400-schema) |
+| [500](#create-tag-500) | Internal Server Error | StatusInternalServerError |  | [schema](#create-tag-500-schema) |
+| [default](#create-tag-default) | | Erreur |  | [schema](#create-tag-default-schema) |
+
+#### Responses
+
+
+##### <span id="create-tag-200"></span> 200 - Retourne le tag
+Status: OK
+
+###### <span id="create-tag-200-schema"></span> Schema
+   
+  
+
+[Tag](#tag)
+
+##### <span id="create-tag-400"></span> 400 - StatusBadRequest
+Status: Bad Request
+
+###### <span id="create-tag-400-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="create-tag-500"></span> 500 - StatusInternalServerError
+Status: Internal Server Error
+
+###### <span id="create-tag-500-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="create-tag-default"></span> Default Response
+Erreur
+
+###### <span id="create-tag-default-schema"></span> Schema
 
   
 
@@ -322,6 +401,136 @@ Status: Internal Server Error
 Erreur
 
 ###### <span id="delete-media-list-default-schema"></span> Schema
+
+  
+
+[ErrResponse](#err-response)
+
+### <span id="delete-tag"></span> delete tag (*DeleteTag*)
+
+```
+DELETE /api/v1/tag/{id}
+```
+
+Supprime un tag existant
+
+#### Produces
+  * application/json
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| id | `path` | string | `string` |  | ✓ |  | nom tu tag |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#delete-tag-200) | OK | Valide la suppression |  | [schema](#delete-tag-200-schema) |
+| [202](#delete-tag-202) | Accepted | StatusAccepted |  | [schema](#delete-tag-202-schema) |
+| [500](#delete-tag-500) | Internal Server Error | StatusInternalServerError |  | [schema](#delete-tag-500-schema) |
+| [default](#delete-tag-default) | | Erreur |  | [schema](#delete-tag-default-schema) |
+
+#### Responses
+
+
+##### <span id="delete-tag-200"></span> 200 - Valide la suppression
+Status: OK
+
+###### <span id="delete-tag-200-schema"></span> Schema
+
+##### <span id="delete-tag-202"></span> 202 - StatusAccepted
+Status: Accepted
+
+###### <span id="delete-tag-202-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="delete-tag-500"></span> 500 - StatusInternalServerError
+Status: Internal Server Error
+
+###### <span id="delete-tag-500-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="delete-tag-default"></span> Default Response
+Erreur
+
+###### <span id="delete-tag-default-schema"></span> Schema
+
+  
+
+[ErrResponse](#err-response)
+
+### <span id="delete-tag-list"></span> delete tag list (*DeleteTagList*)
+
+```
+DELETE /api/v1/tags
+```
+
+Supprime une liste de tags
+
+#### Produces
+  * application/json
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| names | `query` | []string | `[]string` |  | ✓ |  | Liste de noms |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#delete-tag-list-200) | OK | Valide la suppression |  | [schema](#delete-tag-list-200-schema) |
+| [202](#delete-tag-list-202) | Accepted | StatusAccepted |  | [schema](#delete-tag-list-202-schema) |
+| [400](#delete-tag-list-400) | Bad Request | StatusBadRequest |  | [schema](#delete-tag-list-400-schema) |
+| [500](#delete-tag-list-500) | Internal Server Error | StatusInternalServerError |  | [schema](#delete-tag-list-500-schema) |
+| [default](#delete-tag-list-default) | | Erreur |  | [schema](#delete-tag-list-default-schema) |
+
+#### Responses
+
+
+##### <span id="delete-tag-list-200"></span> 200 - Valide la suppression
+Status: OK
+
+###### <span id="delete-tag-list-200-schema"></span> Schema
+
+##### <span id="delete-tag-list-202"></span> 202 - StatusAccepted
+Status: Accepted
+
+###### <span id="delete-tag-list-202-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="delete-tag-list-400"></span> 400 - StatusBadRequest
+Status: Bad Request
+
+###### <span id="delete-tag-list-400-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="delete-tag-list-500"></span> 500 - StatusInternalServerError
+Status: Internal Server Error
+
+###### <span id="delete-tag-list-500-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="delete-tag-list-default"></span> Default Response
+Erreur
+
+###### <span id="delete-tag-list-default-schema"></span> Schema
 
   
 
@@ -609,6 +818,80 @@ Erreur
 
 [ErrResponse](#err-response)
 
+### <span id="retrieve-tag"></span> retrieve tag (*RetrieveTag*)
+
+```
+GET /api/v1/tag/{id}
+```
+
+Retourne des informations détaillées sur un tag
+
+#### Produces
+  * application/json
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| id | `path` | string | `string` |  | ✓ |  | nom du tag |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#retrieve-tag-200) | OK | Retourne un tag |  | [schema](#retrieve-tag-200-schema) |
+| [400](#retrieve-tag-400) | Bad Request | StatusBadRequest |  | [schema](#retrieve-tag-400-schema) |
+| [404](#retrieve-tag-404) | Not Found | StatusNotFound |  | [schema](#retrieve-tag-404-schema) |
+| [500](#retrieve-tag-500) | Internal Server Error | StatusInternalServerError |  | [schema](#retrieve-tag-500-schema) |
+| [default](#retrieve-tag-default) | | Erreur |  | [schema](#retrieve-tag-default-schema) |
+
+#### Responses
+
+
+##### <span id="retrieve-tag-200"></span> 200 - Retourne un tag
+Status: OK
+
+###### <span id="retrieve-tag-200-schema"></span> Schema
+   
+  
+
+[Tag](#tag)
+
+##### <span id="retrieve-tag-400"></span> 400 - StatusBadRequest
+Status: Bad Request
+
+###### <span id="retrieve-tag-400-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="retrieve-tag-404"></span> 404 - StatusNotFound
+Status: Not Found
+
+###### <span id="retrieve-tag-404-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="retrieve-tag-500"></span> 500 - StatusInternalServerError
+Status: Internal Server Error
+
+###### <span id="retrieve-tag-500-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="retrieve-tag-default"></span> Default Response
+Erreur
+
+###### <span id="retrieve-tag-default-schema"></span> Schema
+
+  
+
+[ErrResponse](#err-response)
+
 ### <span id="retrieve-user"></span> retrieve user (*RetrieveUser*)
 
 ```
@@ -678,6 +961,83 @@ Status: Internal Server Error
 Erreur
 
 ###### <span id="retrieve-user-default-schema"></span> Schema
+
+  
+
+[ErrResponse](#err-response)
+
+### <span id="tag-list"></span> tag list (*TagList*)
+
+```
+GET /api/v1/tags
+```
+
+Retourne des informations détaillées sur une liste de tags
+
+#### Produces
+  * application/json
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| limit | `query` | number | `float64` |  |  |  | Limite le nombre de résultats au nombre passé en paramètre |
+| offset | `query` | number | `float64` |  |  |  | Filtre les résultats a partir de l'index passé en paramètre |
+| orderBy | `query` | string | `string` |  |  |  | Permet de trier les résultats par champs |
+| toFind | `query` | string | `string` |  |  |  | Permet le filtre par nom. Retourne les tags pour lesquels le nom contient la chaîne de caractères à rechercher |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#tag-list-200) | OK | Retourne une liste de tags |  | [schema](#tag-list-200-schema) |
+| [400](#tag-list-400) | Bad Request | StatusBadRequest |  | [schema](#tag-list-400-schema) |
+| [404](#tag-list-404) | Not Found | StatusNotFound |  | [schema](#tag-list-404-schema) |
+| [500](#tag-list-500) | Internal Server Error | StatusInternalServerError |  | [schema](#tag-list-500-schema) |
+| [default](#tag-list-default) | | Erreur |  | [schema](#tag-list-default-schema) |
+
+#### Responses
+
+
+##### <span id="tag-list-200"></span> 200 - Retourne une liste de tags
+Status: OK
+
+###### <span id="tag-list-200-schema"></span> Schema
+   
+  
+
+[][Tag](#tag)
+
+##### <span id="tag-list-400"></span> 400 - StatusBadRequest
+Status: Bad Request
+
+###### <span id="tag-list-400-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="tag-list-404"></span> 404 - StatusNotFound
+Status: Not Found
+
+###### <span id="tag-list-404-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="tag-list-500"></span> 500 - StatusInternalServerError
+Status: Internal Server Error
+
+###### <span id="tag-list-500-schema"></span> Schema
+   
+  
+
+[ErrResponse](#err-response)
+
+##### <span id="tag-list-default"></span> Default Response
+Erreur
+
+###### <span id="tag-list-default-schema"></span> Schema
 
   
 
@@ -927,6 +1287,24 @@ Erreur
 | Status | string| `string` | ✓ | | Status du l'image | `open` |
 | Type | string| `string` | ✓ | | Mime type du fichier | `png` |
 | Url | string| `string` |  | | Url du fichier | `/chemin/vers/le/fichier.png` |
+
+
+
+### <span id="tag"></span> Tag
+
+
+> Tag
+  
+
+
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| Name | string| `string` | ✓ | | Nom du Tag | `#python` |
 
 
 
