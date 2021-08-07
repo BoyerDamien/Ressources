@@ -1,10 +1,11 @@
 package offer
 
 import (
+	"time"
+
 	"github.com/BoyerDamien/gapi"
 	"github.com/BoyerDamien/gapi/database"
 	"github.com/BoyerDamien/ressources/tag"
-	"time"
 )
 
 // Offer
@@ -40,7 +41,7 @@ func (s *Offer) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	if res.Error != nil {
 		return res, nil
 	}
-	return db.Where("Name = ?", s.Name).First(s), nil
+	return db.Where("Name = ?", s.Name).Preload("Tags").First(s), nil
 }
 
 func (s *Offer) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {

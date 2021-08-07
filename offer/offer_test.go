@@ -106,6 +106,14 @@ func Test_POST_Offer_with_tags(t *testing.T) {
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+
+	var tagFound tag.Tag
+	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagFound)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data.Tags[0]), ModelToString(tagFound), "Value")
+
 }
 
 /*****************************************************************************
@@ -130,6 +138,7 @@ func Test_GET_Offer(t *testing.T) {
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+
 }
 
 /*****************************************************************************
@@ -189,9 +198,17 @@ func Test_PUT_Offer_update_tag(t *testing.T) {
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+
+	/*var tagFound tag.Tag
+	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagFound)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data.Tags[0]), ModelToString(tagFound), "Value")*/
+
 }
 
-/*****************************************************************************
+/****************************************************************************
  *			Test Delete Routes
  ****************************************************************************/
 func Test_DELETE_User(t *testing.T) {
@@ -215,4 +232,67 @@ func Test_DELETE_User(t *testing.T) {
 	resp, err = tester.Retrieve(urlOne+"/test", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
+}
+
+/*****************************************************************************
+ *			Test GET list Routes
+ ****************************************************************************/
+func Test_GET_Offer_List(t *testing.T) {
+	data := []Offer{
+		{
+			Name:        "test3",
+			Description: "Offre gratuite!",
+			Tags: []tag.Tag{
+				{
+					Name: "Tag1",
+				},
+			},
+		},
+		{
+			Name:        "test2",
+			Description: "120 euros",
+			Tags: []tag.Tag{
+				{
+					Name: "Payant",
+				},
+			},
+		},
+		{
+			Name:        "test1",
+			Description: "10 euros",
+			Tags: []tag.Tag{
+				{
+					Name: "Minimum",
+				},
+			},
+		},
+	}
+	for _, val := range data {
+		tester.Create(urlOne, &val, nil)
+	}
+
+	var all []Offer
+	resp, err := tester.Retrieve(urlList+"?orderBy=name", &all)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, len(data), len(all))
+	utils.AssertEqual(t, "test1", all[0].Name)
+
+	var results []Offer
+	resp, err = tester.Retrieve(urlList+"?toFind=euros", &results)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 2, len(results))
+
+	var found []Offer
+	resp, err = tester.Retrieve(urlList+"?tofind=grat", &found)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 1, len(found), "Size")
+
+	var limit []Offer
+	resp, err = tester.Retrieve(urlList+"?limit=2&offset=1", &limit)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 2, len(limit), "Size")
 }

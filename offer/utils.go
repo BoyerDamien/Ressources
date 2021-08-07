@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/BoyerDamien/gapi"
+	"github.com/BoyerDamien/ressources/tag"
 
 	"github.com/BoyerDamien/gapi/database/driver/sqlite"
 )
@@ -106,7 +107,7 @@ func SetupApp(url string) *gapi.App {
 	os.Remove("test.db")
 	app := gapi.New(sqlite.Open("test.db"), gapi.Config{})
 	api := app.Collection(url)
-	api.AddRessources(&Offer{})
+	api.AddRessources(&Offer{}, &tag.Tag{})
 	return app
 }
 
