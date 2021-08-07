@@ -296,3 +296,53 @@ func Test_GET_Offer_List(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, 2, len(limit), "Size")
 }
+
+/*****************************************************************************
+ *			Test Delete list Routes
+ ****************************************************************************/
+func Test_DELETE_Offer_List(t *testing.T) {
+	data := []Offer{
+		{
+			Name:        "test3",
+			Description: "Offre gratuite!",
+			Tags: []tag.Tag{
+				{
+					Name: "Tag1",
+				},
+			},
+		},
+		{
+			Name:        "test2",
+			Description: "120 euros",
+			Tags: []tag.Tag{
+				{
+					Name: "Payant",
+				},
+			},
+		},
+		{
+			Name:        "test1",
+			Description: "10 euros",
+			Tags: []tag.Tag{
+				{
+					Name: "Minimum",
+				},
+			},
+		},
+	}
+	for _, val := range data {
+		tester.Create(urlOne, &val, nil)
+	}
+
+	endpoint := urlList + "?names=test3,test2,test1"
+	resp, err := app.Test(httptest.NewRequest("DELETE", endpoint, nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	var result2 []Offer
+	resp, err = tester.Retrieve(urlList+"?toFind=test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 0, len(result2), "Size")
+}
