@@ -242,7 +242,7 @@ func Test_DELETE_User(t *testing.T) {
 }
 
 /*****************************************************************************
- *					Test GET list Routes
+ *			Test GET list Routes
  ****************************************************************************/
 func Test_GET_User_List(t *testing.T) {
 	data := []User{

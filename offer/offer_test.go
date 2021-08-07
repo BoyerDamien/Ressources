@@ -1,0 +1,218 @@
+package offer
+
+import (
+	"fmt"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/BoyerDamien/ressources/tag"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
+)
+
+var (
+	url     = "/api/v1"
+	app     = SetupApp(url)
+	urlOne  = fmt.Sprintf("%s/offer", url)
+	urlList = fmt.Sprintf("%ss", urlOne)
+	tester  = testApi{App: app}
+)
+
+/*****************************************************************************
+ *					Test empty routes
+ ****************************************************************************/
+
+func Test_GET_Offer_Empty(t *testing.T) {
+
+	url := fmt.Sprintf("%s/test", urlOne)
+
+	resp, err := app.Test(httptest.NewRequest("GET", url, nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
+}
+
+func Test_GET_Offer_List_Empty(t *testing.T) {
+
+	resp, err := app.Test(httptest.NewRequest("GET", urlList, nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+}
+
+func Test_DELETE_Offer_Empty(t *testing.T) {
+	resp, err := app.Test(httptest.NewRequest("DELETE", fmt.Sprintf("%s/test", urlOne), nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusAccepted, resp.StatusCode, "Status code")
+}
+
+func Test_DELETE_Offer_List_Empty(t *testing.T) {
+	resp, err := app.Test(httptest.NewRequest("DELETE", fmt.Sprintf("%s?name=test", urlList), nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusAccepted, resp.StatusCode, "Status code")
+}
+
+func Test_PUT_Offerr_Empty(t *testing.T) {
+	tester := testApi{App: app}
+
+	data := Offer{
+		Name: "test",
+	}
+	var result Offer
+	resp, err := tester.Update(url, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
+}
+
+/*****************************************************************************
+ *					Test create routes
+ ****************************************************************************/
+
+func Test_POST_Offer_without_tags(t *testing.T) {
+	data := Offer{
+		Name:        "test",
+		Description: "description",
+	}
+	var result Offer
+	resp, err := tester.Create(urlOne, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
+}
+
+func Test_POST_Offer_with_tags(t *testing.T) {
+	data := Offer{
+		Name:        "test",
+		Description: "description",
+		Tags: []tag.Tag{
+			{
+				Name: "Tag1",
+			},
+		},
+	}
+
+	var result Offer
+	resp, err := tester.Create(urlOne, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+
+	var result2 Offer
+	resp, err = tester.Retrieve(urlOne+"/test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+}
+
+/*****************************************************************************
+ *			Test retrieve routes
+ ****************************************************************************/
+func Test_GET_Offer(t *testing.T) {
+	data := Offer{
+		Name:        "test",
+		Description: "description",
+		Tags: []tag.Tag{
+			{
+				Name: "Tag1",
+			},
+		},
+	}
+
+	tester.Create(urlOne, &data, nil)
+
+	var result Offer
+	resp, err := tester.Retrieve(urlOne+"/test", &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+}
+
+/*****************************************************************************
+ *			Test Update Routes
+ ****************************************************************************/
+func Test_PUT_Offer_simple(t *testing.T) {
+	data := Offer{
+		Name:        "test",
+		Description: "description",
+		Tags: []tag.Tag{
+			{
+				Name: "Tag1",
+			},
+		},
+	}
+	tester.Create(urlOne, &data, nil)
+
+	data.Description = "Changed"
+
+	var result Offer
+	resp, err := tester.Update(urlOne, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+
+	var result2 Offer
+	resp, err = tester.Retrieve(urlOne+"/test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+}
+
+func Test_PUT_Offer_update_tag(t *testing.T) {
+	data := Offer{
+		Name:        "test",
+		Description: "description",
+		Tags: []tag.Tag{
+			{
+				Name: "Tag1",
+			},
+		},
+	}
+	tester.Create(urlOne, &data, nil)
+
+	data.Tags[0].Name = "Tag2"
+
+	var result Offer
+	resp, err := tester.Update(urlOne, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+
+	var result2 Offer
+	resp, err = tester.Retrieve(urlOne+"/test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+}
+
+/*****************************************************************************
+ *			Test Delete Routes
+ ****************************************************************************/
+func Test_DELETE_User(t *testing.T) {
+	data := Offer{
+		Name:        "test",
+		Description: "description",
+		Tags: []tag.Tag{
+			{
+				Name: "Tag1",
+			},
+		},
+	}
+	tester.Create(urlOne, &data, nil)
+
+	resp, err := app.Test(httptest.NewRequest("DELETE", fmt.Sprintf("%s/test", urlOne), nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	var result2 Offer
+	resp, err = tester.Retrieve(urlOne+"/test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
+}
