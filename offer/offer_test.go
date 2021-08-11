@@ -54,7 +54,7 @@ func Test_DELETE_Offer_List_Empty(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusAccepted, resp.StatusCode, "Status code")
 }
 
-func Test_PUT_Offerr_Empty(t *testing.T) {
+func Test_PUT_Offer_Empty(t *testing.T) {
 	tester := testApi{App: app}
 
 	data := Offer{
@@ -199,13 +199,12 @@ func Test_PUT_Offer_update_tag(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
 
-	/*var tagFound tag.Tag
-	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagFound)
-
-	utils.AssertEqual(t, nil, err, "app.Test")
-	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data.Tags[0]), ModelToString(tagFound), "Value")*/
-
+	// 	var tagFound tag.Tag
+	// 	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagFound)
+	// 	utils.AssertEqual(t, nil, err, "app.Test")
+	// 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	// 	utils.AssertEqual(t, ModelToString(data.Tags[0]), ModelToString(tagFound), "Value")
+	//
 }
 
 /****************************************************************************

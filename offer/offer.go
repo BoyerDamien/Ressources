@@ -26,7 +26,7 @@ type Offer struct {
 
 	// Tags liés l'offre
 	// required: true
-	Tags []tag.Tag `json:"tags" gorm:"many2many:offer_tags;" validate:"required"`
+	Tags []tag.Tag `json:"tags" gorm:"many2many:offer_tags;constraint:OnUpdate:CASCADE" validate:"required"`
 }
 
 func (s *Offer) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
