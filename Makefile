@@ -9,7 +9,7 @@ doc: install
 	$(DOC_GEN)
 	$(MARKDOWN_GEN)
 
-run: build
+run: doc
 	swagger serve $(DOC_FILENAME)
 
 install:
