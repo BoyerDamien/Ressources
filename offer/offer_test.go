@@ -6,16 +6,17 @@ import (
 	"testing"
 
 	"github.com/BoyerDamien/ressources/tag"
+	"github.com/BoyerDamien/ressources/testUtils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 )
 
 var (
 	url     = "/api/v1"
-	app     = SetupApp(url)
+	app     = testUtils.SetupApp(url, &Offer{}, &tag.Tag{})
 	urlOne  = fmt.Sprintf("%s/offer", url)
 	urlList = fmt.Sprintf("%ss", urlOne)
-	tester  = testApi{App: app}
+	tester  = testUtils.TestApi{App: app}
 )
 
 /*****************************************************************************
@@ -55,8 +56,6 @@ func Test_DELETE_Offer_List_Empty(t *testing.T) {
 }
 
 func Test_PUT_Offer_Empty(t *testing.T) {
-	tester := testApi{App: app}
-
 	data := Offer{
 		Name: "test",
 	}
@@ -99,20 +98,20 @@ func Test_POST_Offer_with_tags(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 	var result2 Offer
 	resp, err = tester.Retrieve(urlOne+"/test", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 
 	var tagFound tag.Tag
 	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagFound)
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data.Tags[0]), ModelToString(tagFound), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data.Tags[0]), testUtils.ModelToString(tagFound), "Value")
 
 }
 
@@ -137,7 +136,7 @@ func Test_GET_Offer(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 }
 
@@ -163,13 +162,13 @@ func Test_PUT_Offer_simple(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 	var result2 Offer
 	resp, err = tester.Retrieve(urlOne+"/test", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 }
 
 func Test_PUT_Offer_update_tag(t *testing.T) {
@@ -191,19 +190,19 @@ func Test_PUT_Offer_update_tag(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 	var result2 Offer
 	resp, err = tester.Retrieve(urlOne+"/test", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 
 	// 	var tagFound tag.Tag
 	// 	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagFound)
 	// 	utils.AssertEqual(t, nil, err, "app.Test")
 	// 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	// 	utils.AssertEqual(t, ModelToString(data.Tags[0]), ModelToString(tagFound), "Value")
+	// 	utils.AssertEqual(t, testUtils.ModelToString(data.Tags[0]), testUtils.ModelToString(tagFound), "Value")
 	//
 }
 
