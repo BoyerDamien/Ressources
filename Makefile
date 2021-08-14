@@ -5,8 +5,10 @@ MARDOWN_FILENAME = readme.md
 MARKDOWN_GEN = swagger generate markdown -f $(DOC_FILENAME) --output $(MARDOWN_FILENAME)
 RM = rm -rf
 
-build: install doc
-	
+doc: install
+	$(DOC_GEN)
+	$(MARKDOWN_GEN)
+
 run: build
 	swagger serve $(DOC_FILENAME)
 
@@ -16,17 +18,13 @@ install:
 
 rerun: re run
 
+re: clean doc
+
 
 clean:
 	go clean
 	$(RM) $(DOC_FILENAME) $(MARDOWN_FILENAME)
 	find . -name "test.db" -exec rm {} \;
-
-doc: install
-	$(DOC_GEN)
-	$(MARKDOWN_GEN)
-
-re: clean build
 
 test:
 	go test -v ./...
