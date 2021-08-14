@@ -13,7 +13,7 @@ run: build
 	swagger serve $(DOC_FILENAME)
 
 install:
-	which swagger || go get -u github.com/go-swagger/go-swagger
+	which swagger || ./swagger_install.sh
 	go mod tidy
 
 rerun: re run
