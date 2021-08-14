@@ -5,16 +5,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/BoyerDamien/ressources/testUtils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 )
 
 var (
 	url     = "/api/v1"
-	app     = SetupApp(url)
+	app     = testUtils.SetupApp(url, &User{})
 	urlOne  = fmt.Sprintf("%s/user", url)
 	urlList = fmt.Sprintf("%ss", urlOne)
-	tester  = testApi{App: app}
+	tester  = testUtils.TestApi{App: app}
 )
 
 /*****************************************************************************
@@ -54,7 +55,6 @@ func Test_DELETE_User_List_Empty(t *testing.T) {
 }
 
 func Test_PUT_User_Empty(t *testing.T) {
-	tester := testApi{App: app}
 	data := User{
 		Email:    "test@gmail.com",
 		Password: "test",
@@ -85,13 +85,13 @@ func Test_POST_User(t *testing.T) {
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	data.Password = ""
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 	var result2 User
 	resp, err = tester.Retrieve(urlOne+"/test@gmail.com", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 }
 
 func Test_POST_User_Wrong_Mail(t *testing.T) {
@@ -154,7 +154,7 @@ func Test_GET_User(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 }
 
 /*****************************************************************************
@@ -178,13 +178,13 @@ func Test_PUT_User(t *testing.T) {
 	data.Password = ""
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 	var result2 User
 	resp, err = tester.Retrieve(urlOne+"/test@gmail.com", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 }
 
 func Test_PUT_User_Invalid_Column(t *testing.T) {
@@ -207,13 +207,13 @@ func Test_PUT_User_Invalid_Column(t *testing.T) {
 	data.Role = "admin"
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 	var result2 User
 	resp, err = tester.Retrieve(urlOne+"/test@gmail.com", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 }
 
 /*****************************************************************************

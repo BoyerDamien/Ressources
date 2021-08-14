@@ -1,0 +1,113 @@
+package portfolio
+
+import (
+	"github.com/BoyerDamien/gapi"
+	"github.com/BoyerDamien/gapi/database"
+	"github.com/BoyerDamien/ressources/media"
+	"github.com/BoyerDamien/ressources/tag"
+	"time"
+)
+
+// Portfolio
+//
+// swagger:model
+type PortFolio struct {
+	// Base model
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+
+	// Gallery
+	// required: true
+	Gallery []media.Media `json:"gallery" gorm:"many2many:portfolio_medias;" validate:"required"`
+
+	// Logo
+	// required: true
+	Logo media.Media `json:"logo" validate:"required" gorm:"foreignKey:Name"`
+
+	// Website
+	// required: true
+	Website string `json:"website" validate:"url,required"`
+
+	// Name
+	// required: true
+	Name string `json:"name" validate:"required" gorm:"primaryKey"`
+
+	// Description
+	// required: true
+	Description string `json:"description" validate:"required"`
+
+	// Tags
+	// required: true
+	Tags []tag.Tag `json:"tags" gorm:"many2many:portfolios_tags;" validate:"required"`
+}
+
+func (s *PortFolio) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
+	return db.Where("Name = ?", c.Params("id")).Preload("Tags").Preload("Gallery").First(s), nil
+}
+
+func (s *PortFolio) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
+	if err := db.Model(s).Where("Name = ?", s.Name).Association("Gallery").Replace(s.Gallery); err != nil {
+		return nil, err
+	}
+	if err := db.Model(s).Where("Name = ?", s.Name).Association("Tags").Replace(s.Tags); err != nil {
+		return nil, err
+	}
+	return db.Model(s).Where("Name = ?", s.Name).Updates(s), nil
+}
+
+func (s *PortFolio) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
+	return db.FirstOrCreate(s, s), nil
+}
+
+func (s *PortFolio) Delete(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
+	return db.Model(s).Where("Name = ?", c.Params("id")).Delete(s), nil
+}
+
+func (s *PortFolio) DeleteListQuery() gapi.Query {
+	return &PortFolioDeleteQuery{}
+}
+
+func (s *PortFolio) ListQuery() gapi.Query {
+	return &PortFolioListQuery{}
+}
+
+type PortFolioListQuery struct {
+	ToFind  string `query:"tofind"`
+	OrderBy string `query:"orderBy" validate:"omitempty,eq=created_at|eq=updated_at|eq=name"`
+	Limit   int    `query:"limit" validate:"omitempty,gte=0"`
+	Offset  int    `query:"offset" validate:"omitempty,gte=0"`
+}
+
+func (s *PortFolioListQuery) Run(c *gapi.Ctx, db *database.DB) (*database.DB, interface{}) {
+
+	portFolios := new([]PortFolio)
+	tmp := db
+
+	if s.Limit > 0 {
+		tmp = tmp.Limit(s.Limit)
+	}
+	if s.Offset > 0 {
+		tmp = tmp.Offset(s.Offset)
+	}
+	if len(s.ToFind) > 0 {
+		tmp = tmp.Where("Name LIKE ?", "%"+s.ToFind+"%").Or("Description LIKE ?", "%"+s.ToFind+"%")
+	}
+	if len(s.OrderBy) > 0 {
+		tmp = tmp.Order(s.OrderBy)
+	}
+	result := tmp.Preload("Tags").Preload("Gallery").Find(portFolios)
+	return result, portFolios
+}
+
+type PortFolioDeleteQuery struct {
+	Names []string `query:"names"`
+}
+
+func (s *PortFolioDeleteQuery) Run(c *gapi.Ctx, db *database.DB) (*database.DB, interface{}) {
+	var portFolios []PortFolio
+
+	if result := db.Where("Name IN ?", s.Names).Find(&portFolios); result.Error != nil {
+		return result, nil
+	}
+	return db.Delete(&portFolios, s.Names), nil
+}

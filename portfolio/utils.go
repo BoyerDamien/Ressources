@@ -1,16 +1,21 @@
-package tag
+package portfolio
 
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 
 	"github.com/BoyerDamien/gapi"
 
 	"github.com/BoyerDamien/gapi/database/driver/sqlite"
+	"github.com/BoyerDamien/ressources/media"
+	"github.com/BoyerDamien/ressources/tag"
 )
 
 type testApi struct {
@@ -28,15 +33,20 @@ func (s *testApi) ReadData(resp *http.Response, result interface{}) error {
 	return nil
 }
 
-func (s *testApi) Create(endpoint string, data interface{}, result interface{}) (*http.Response, error) {
-	reqByte, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-	req := httptest.NewRequest("POST", endpoint, bytes.NewReader(reqByte))
-	req.Header.Add("Content-Type", "application/json")
+func (s *testApi) Create(endpoint, path string, result interface{}) (*http.Response, error) {
+	file, _ := os.Open(path)
+	defer file.Close()
 
-	resp, err := s.App.Test(req)
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, _ := writer.CreateFormFile("media", filepath.Base(file.Name()))
+	io.Copy(part, file)
+	writer.Close()
+
+	r, _ := http.NewRequest("POST", endpoint, body)
+	r.Header.Add("Content-Type", writer.FormDataContentType())
+
+	resp, err := s.App.Test(r)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +116,8 @@ func SetupApp(url string) *gapi.App {
 	os.Remove("test.db")
 	app := gapi.New(sqlite.Open("test.db"), gapi.Config{})
 	api := app.Collection(url)
-	api.AddRessources(&Tag{})
+	api.AddRessources(&media.Media{}, &tag.Tag{}, &PortFolio{})
+	app.Static("/static", ".")
 	return app
 }
 

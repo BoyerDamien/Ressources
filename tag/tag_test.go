@@ -5,16 +5,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/BoyerDamien/ressources/testUtils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 )
 
 var (
 	url     = "/api/v1"
-	app     = SetupApp(url)
+	app     = testUtils.SetupApp(url, &Tag{})
 	urlOne  = fmt.Sprintf("%s/tag", url)
 	urlList = fmt.Sprintf("%ss", urlOne)
-	tester  = testApi{App: app}
+	tester  = testUtils.TestApi{App: app}
 )
 
 func Test_GET_Tag_Empty(t *testing.T) {
@@ -62,13 +63,13 @@ func Test_POST_Tag(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 
 	var result2 Tag
 	resp, err = tester.Retrieve(urlOne+"/test", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result2), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 }
 
 /*****************************************************************************
@@ -85,7 +86,7 @@ func Test_GET_Tag(t *testing.T) {
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, ModelToString(data), ModelToString(result), "Value")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
 }
 
 /*****************************************************************************

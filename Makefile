@@ -19,7 +19,8 @@ rerun: re run
 
 clean:
 	go clean
-	$(RM) $(DOC_FILENAME) $(MARDOWN_FILENAME) test.db
+	$(RM) $(DOC_FILENAME) $(MARDOWN_FILENAME)
+	find . -name "test.db" -exec rm {} \;
 
 doc: install
 	$(DOC_GEN)
