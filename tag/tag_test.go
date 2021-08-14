@@ -18,6 +18,9 @@ var (
 	tester  = testUtils.TestApi{App: app}
 )
 
+/****************************************************************************************
+*				Test empty routes
+****************************************************************************************/
 func Test_GET_Tag_Empty(t *testing.T) {
 
 	url := fmt.Sprintf("%s/test", urlOne)
