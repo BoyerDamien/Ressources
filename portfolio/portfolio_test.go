@@ -200,3 +200,36 @@ func Test_PUT_PortFolio_simple(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result3), "Value")
 }
+
+func Test_PUT_PortFolio_Tag(t *testing.T) {
+	data := PortFolio{
+		Name:        "test",
+		Description: "Changed",
+		Gallery:     []media.Media{},
+		Tags: []tag.Tag{
+			{
+				Name: "test",
+			},
+		},
+		Website: "https://changed.com",
+	}
+
+	var result PortFolio
+	resp, err := tester.Create(urlOne, &data, &result)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
+
+	var result2 PortFolio
+	data.Tags = append(data.Tags, tag.Tag{Name: "test2"})
+	resp, err = tester.Update(urlOne, &data, &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
+
+	var result3 PortFolio
+	resp, err = tester.Retrieve(urlOne+"/"+data.Name, &result3)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result3), "Value")
+}

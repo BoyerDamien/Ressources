@@ -189,7 +189,7 @@ func (s *Media) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	s.Url = path.Join(os.Getenv("STATIC_FILES_MEDIA_URL"), media.Filename)
 	s.Status = "protected"
 
-	result := db.FirstOrCreate(s, s)
+	result := db.FirstOrCreate(s, Media{Name: s.Name})
 	if result.Error != nil {
 		return result, nil
 	}

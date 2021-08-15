@@ -67,7 +67,7 @@ func (s *PortFolio) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 }
 
 func (s *PortFolio) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	return db.FirstOrCreate(s, s), nil
+	return db.FirstOrCreate(s, PortFolio{Name: s.Name}), nil
 }
 
 func (s *PortFolio) Delete(c *gapi.Ctx, db *database.DB) (*database.DB, error) {

@@ -48,7 +48,7 @@ func (s *Offer) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 }
 
 func (s *Offer) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	return db.FirstOrCreate(s, s), nil
+	return db.FirstOrCreate(s, Offer{Name: s.Name}), nil
 }
 
 func (s *Offer) Delete(c *gapi.Ctx, db *database.DB) (*database.DB, error) {

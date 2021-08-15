@@ -203,7 +203,7 @@ func (s *User) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	if s.Password == "" {
 		return db, fmt.Errorf("no password")
 	}
-	return db.FirstOrCreate(s, s), nil
+	return db.FirstOrCreate(s, User{Email: s.Email}), nil
 }
 
 // swagger:operation DELETE /user/{id} User DeleteUser

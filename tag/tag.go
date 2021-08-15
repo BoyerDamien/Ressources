@@ -95,7 +95,7 @@ func (s *Tag) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
 func (s *Tag) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	return db.FirstOrCreate(s, s), nil
+	return db.FirstOrCreate(s, Tag{Name: s.Name}), nil
 }
 
 // swagger:operation DELETE /tag/{id} Tag DeleteTag
