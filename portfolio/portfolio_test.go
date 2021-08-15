@@ -91,3 +91,75 @@ func Test_POST_PortFolio(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 }
+
+func Test_POST_PortFolio_without_website(t *testing.T) {
+	var mediaResult media.Media
+	resp, err := tester.CreateForm(fmt.Sprintf("%s/media", url), "../testFile.txt", "media", &mediaResult)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	data := PortFolio{
+		Name:        "test",
+		Description: "test",
+		Gallery:     []media.Media{mediaResult},
+		Tags: []tag.Tag{
+			{
+				Name: "test",
+			},
+		},
+	}
+
+	var result PortFolio
+	resp, err = tester.Create(urlOne, &data, &result)
+	data.Gallery = []media.Media{}
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
+}
+
+func Test_POST_PortFolio_without_tag(t *testing.T) {
+	var mediaResult media.Media
+	resp, err := tester.CreateForm(fmt.Sprintf("%s/media", url), "../testFile.txt", "media", &mediaResult)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	data := PortFolio{
+		Name:        "test",
+		Description: "test",
+		Gallery:     []media.Media{mediaResult},
+		Website:     "https://test.com",
+	}
+	var result PortFolio
+	resp, err = tester.Create(urlOne, &data, &result)
+	data.Gallery = []media.Media{}
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
+}
+
+/*****************************************************************************
+ *					Test retrieve routes
+ ****************************************************************************/
+func Test_GET_PortFolio(t *testing.T) {
+	data := PortFolio{
+		Name:        "test",
+		Description: "test",
+		Gallery:     []media.Media{},
+		Tags: []tag.Tag{
+			{
+				Name: "test",
+			},
+		},
+		Website: "https://test.com",
+	}
+
+	var result PortFolio
+	resp, err := tester.Create(urlOne, &data, &result)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
+
+	var result2 PortFolio
+	resp, err = tester.Retrieve(urlOne+"/"+data.Name, &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
+}
