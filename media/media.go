@@ -139,7 +139,7 @@ func (s *Media) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 		}
 		m := new(Media)
 		r := db.Where("Name = ?", s.Name).First(m)
-		s = m
+		*s = *m
 		return r, nil
 	}
 	return nil, fmt.Errorf("wrong status")

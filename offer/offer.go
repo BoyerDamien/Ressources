@@ -30,25 +30,6 @@ type Offer struct {
 	Tags []tag.Tag `json:"tags" gorm:"many2many:offer_tags;constraint:OnUpdate:CASCADE;References:Name" validate:"required"`
 }
 
-// func (s *Offer) BeforeUpdate(tx *database.DB) error {
-// 	var tagsName []string
-//
-// 	if len(s.Tags) > 0 {
-// 		for _, val := range s.Tags {
-// 			tagsName = append(tagsName, val.Name)
-// 		}
-// 		tags := new([]tag.Tag)
-// 		res := tx.Where("Name in ?", tagsName).Find(tags)
-// 		if res.Error != nil {
-// 			return fmt.Errorf("internal error")
-// 		}
-// 		if len(*tags) != len(s.Tags) {
-// 			return fmt.Errorf("wrong association")
-// 		}
-// 	}
-// 	return nil
-// }
-
 func (s *Offer) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	return db.Where("Name = ?", c.Params("id")).Preload("Tags").First(s), nil
 }
