@@ -51,14 +51,17 @@ func (s *PortFolio) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error)
 }
 
 func (s *PortFolio) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	if err := db.Model(s).Where("Name = ?", s.Name).Association("Gallery").Replace(s.Gallery); err != nil {
+	if err := db.Model(s).Association("Gallery").Replace(s.Gallery); err != nil {
 		return nil, err
 	}
-	if err := db.Model(s).Where("Name = ?", s.Name).Association("Tags").Replace(s.Tags); err != nil {
+	if err := db.Model(s).Association("Tags").Replace(s.Tags); err != nil {
 		return nil, err
+	}
+	if res := db.Model(s).Updates(s); res.Error != nil {
+		return res, nil
 	}
 	p := new(PortFolio)
-	r := db.Where("Name = ?", c.Params("id")).Preload("Tags").Preload("Gallery").First(p)
+	r := db.Where("Name = ?", s.Name).Preload("Tags").Preload("Gallery").First(p)
 	*s = *p
 	return r, nil
 }
