@@ -1,11 +1,12 @@
 package portfolio
 
 import (
+	"time"
+
 	"github.com/BoyerDamien/gapi"
 	"github.com/BoyerDamien/gapi/database"
 	"github.com/BoyerDamien/ressources/media"
 	"github.com/BoyerDamien/ressources/tag"
-	"time"
 )
 
 // Portfolio
@@ -18,11 +19,7 @@ type PortFolio struct {
 
 	// Gallery
 	// required: true
-	Gallery []media.Media `json:"gallery" gorm:"many2many:portfolio_medias;" validate:"required"`
-
-	// Logo
-	// required: true
-	Logo media.Media `json:"logo" validate:"required" gorm:"foreignKey:Name"`
+	Gallery []media.Media `json:"gallery" gorm:"many2many:portfolio_medias;" validate:"dive"`
 
 	// Website
 	// required: true
@@ -38,11 +35,14 @@ type PortFolio struct {
 
 	// Tags
 	// required: true
-	Tags []tag.Tag `json:"tags" gorm:"many2many:portfolios_tags;" validate:"required"`
+	Tags []tag.Tag `json:"tags" gorm:"many2many:portfolios_tags;" validate:"required,dive"`
 }
 
 func (s *PortFolio) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	return db.Where("Name = ?", c.Params("id")).Preload("Tags").Preload("Gallery").First(s), nil
+	p := new(PortFolio)
+	r := db.Where("Name = ?", c.Params("id")).Preload("Tags").Preload("Gallery").First(p)
+	*s = *p
+	return r, nil
 }
 
 func (s *PortFolio) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
@@ -52,7 +52,10 @@ func (s *PortFolio) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	if err := db.Model(s).Where("Name = ?", s.Name).Association("Tags").Replace(s.Tags); err != nil {
 		return nil, err
 	}
-	return db.Model(s).Where("Name = ?", s.Name).Updates(s), nil
+	p := new(PortFolio)
+	r := db.Where("Name = ?", c.Params("id")).Preload("Tags").Preload("Gallery").First(p)
+	*s = *p
+	return r, nil
 }
 
 func (s *PortFolio) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {

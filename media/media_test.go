@@ -172,7 +172,6 @@ func Test_PUT_Media_Wrong_Status(t *testing.T) {
 	data.Status = "protected"
 	var result2 Media
 	resp, err = tester.Retrieve(urlOne+"/testFile.txt", &result2)
-	fmt.Println("result2 = ", result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value2")
