@@ -52,13 +52,16 @@ type User struct {
 	Role string `json:"role" validate:"required,eq=admin|eq=customer|eq=user"`
 }
 
-func (s *User) BeforeCreate(tx *database.DB) (err error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(s.Password), bcrypt.MinCost)
-	if err != nil {
-		return err
+func (s *User) BeforeCreate(tx *database.DB) error {
+	if len(s.Password) > 0 {
+		bytes, err := bcrypt.GenerateFromPassword([]byte(s.Password), bcrypt.MinCost)
+		if err != nil {
+			return err
+		}
+		s.Password = string(bytes)
+		return nil
 	}
-	s.Password = string(bytes)
-	return
+	return fmt.Errorf("no password")
 }
 
 func (s *User) AfterCreate(tx *database.DB) (err error) {
@@ -74,6 +77,13 @@ func (s *User) AfterFind(tx *database.DB) (err error) {
 func (s *User) AfterUpdate(tx *database.DB) (err error) {
 	s.Password = ""
 	return
+}
+
+func (s *User) BeforeUpdate(tx *database.DB) error {
+	if len(s.Password) > 0 {
+		return s.BeforeCreate(tx)
+	}
+	return nil
 }
 
 // swagger:operation GET /user/{id} User RetrieveUser
@@ -150,7 +160,7 @@ func (s *User) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
 func (s *User) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	res := db.Model(s).Omit("Email", "Role", "Password").Updates(s)
+	res := db.Model(s).Omit("Email", "Role").Updates(s)
 	if res.Error != nil {
 		return res, nil
 	}

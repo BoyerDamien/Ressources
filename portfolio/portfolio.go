@@ -38,6 +38,11 @@ type PortFolio struct {
 	Tags []tag.Tag `json:"tags" gorm:"many2many:portfolios_tags;" validate:"required,dive"`
 }
 
+func (s *PortFolio) BeforeCreate(tx *database.DB) error {
+	s.Gallery = []media.Media{}
+	return nil
+}
+
 func (s *PortFolio) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	p := new(PortFolio)
 	r := db.Where("Name = ?", c.Params("id")).Preload("Tags").Preload("Gallery").First(p)

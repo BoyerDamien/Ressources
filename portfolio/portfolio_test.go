@@ -80,6 +80,7 @@ func Test_POST_PortFolio(t *testing.T) {
 
 	var result PortFolio
 	resp, err = tester.Create(urlOne, &data, &result)
+	data.Gallery = []media.Media{}
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
