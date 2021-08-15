@@ -83,6 +83,10 @@ func Test_GET_Tag(t *testing.T) {
 		Name: "test",
 	}
 	tester.Create(urlOne, &data, nil)
+	data.Name = "test2"
+	tester.Create(urlOne, &data, nil)
+	data.Name = "test3"
+	tester.Create(urlOne, &data, nil)
 
 	var result Tag
 	resp, err := tester.Retrieve(urlOne+"/test", &result)
@@ -118,19 +122,19 @@ func Test_DELETE_Tag(t *testing.T) {
 func Test_GET_Tag_List(t *testing.T) {
 	data := []Tag{
 		{
-			Name: "test",
+			Name: "finaltest",
 		},
 		{
-			Name: "okok",
+			Name: "finalokok",
 		},
 		{
-			Name: "aaaa",
+			Name: "finalaaaa",
 		},
 		{
-			Name: "tata",
+			Name: "finaltata",
 		},
 		{
-			Name: "kaka",
+			Name: "finalkaka",
 		},
 	}
 
@@ -139,17 +143,17 @@ func Test_GET_Tag_List(t *testing.T) {
 	}
 
 	var all []Tag
-	resp, err := tester.Retrieve(urlList+"?orderBy=name", &all)
+	resp, err := tester.Retrieve(urlList+"?orderBy=name&toFind=final", &all)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, len(data), len(all))
-	utils.AssertEqual(t, "aaaa", all[0].Name)
+	utils.AssertEqual(t, data[2].Name, all[0].Name)
 
 	var filter []Tag
-	resp, err = tester.Retrieve(urlList+"?toFind=a", &filter)
+	resp, err = tester.Retrieve(urlList+"?toFind=k", &filter)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	utils.AssertEqual(t, 3, len(filter))
+	utils.AssertEqual(t, 2, len(filter))
 
 	var found []Tag
 	resp, err = tester.Retrieve(urlList+"?tofind=ok", &found)

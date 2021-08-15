@@ -111,7 +111,10 @@ func (s *User) AfterUpdate(tx *database.DB) (err error) {
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
 func (s *User) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	return db.Where("Email = ?", c.Params("id")).First(s), nil
+	u := new(User)
+	r := db.Where("Email = ?", c.Params("id")).First(u)
+	*s = *u
+	return r, nil
 }
 
 // swagger:operation PUT /user User Update

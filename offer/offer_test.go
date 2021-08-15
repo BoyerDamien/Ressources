@@ -183,7 +183,7 @@ func Test_PUT_Offer_update_tag(t *testing.T) {
 	}
 	tester.Create(urlOne, &data, nil)
 
-	data.Tags[0].Name = "Tag2"
+	data.Tags = append(data.Tags, tag.Tag{Name: "Tag2"})
 
 	var result Offer
 	resp, err := tester.Update(urlOne, &data, &result)
@@ -198,18 +198,52 @@ func Test_PUT_Offer_update_tag(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
 
-	// 	var tagFound tag.Tag
-	// 	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagFound)
-	// 	utils.AssertEqual(t, nil, err, "app.Test")
-	// 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
-	// 	utils.AssertEqual(t, testUtils.ModelToString(data.Tags[0]), testUtils.ModelToString(tagFound), "Value")
-	//
+	var tagsFound []tag.Tag
+	resp, err = tester.Retrieve(fmt.Sprintf("%s/tags?names=%s,%s", url, data.Tags[0].Name, data.Tags[1].Name), &tagsFound)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data.Tags), testUtils.ModelToString(tagsFound), "Value")
+}
+
+func Test_PUT_Offer_update_non_existing_Tag(t *testing.T) {
+	data := Offer{
+		Name:        "test",
+		Description: "description",
+		Tags: []tag.Tag{
+			{
+				Name: "Tag1",
+			},
+		},
+	}
+	tester.Create(urlOne, &data, nil)
+
+	data.Tags[0].Name = "Tag3"
+
+	var result Offer
+	resp, err := tester.Update(urlOne, &data, &result)
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
+
+	var result2 Offer
+	resp, err = tester.Retrieve(urlOne+"/test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result2), "Value")
+
+	var tagsFound tag.Tag
+	resp, err = tester.Retrieve(fmt.Sprintf("%s/tag/%s", url, data.Tags[0].Name), &tagsFound)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data.Tags[0]), testUtils.ModelToString(tagsFound), "Value")
+
 }
 
 /****************************************************************************
  *			Test Delete Routes
  ****************************************************************************/
-func Test_DELETE_User(t *testing.T) {
+func Test_DELETE_Offer(t *testing.T) {
 	data := Offer{
 		Name:        "test",
 		Description: "description",

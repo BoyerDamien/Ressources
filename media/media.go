@@ -94,7 +94,10 @@ func (s *Media) BeforeFind(tx *database.DB) (err error) {
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
 func (s *Media) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	return db.Where("Name = ?", c.Params("id")).First(s), nil
+	m := new(Media)
+	r := db.Where("name = ?", c.Params("id")).First(m)
+	*s = *m
+	return r, nil
 }
 
 // swagger:operation PUT /media Media UpdateMedia
@@ -131,10 +134,13 @@ func (s *Media) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 //       "$ref": "#/definitions/ErrResponse"
 func (s *Media) Update(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	if s.Status == "open" || s.Status == "protected" {
-		if res := db.Model(s).Select("Status").Updates(s); res.Error != nil {
+		if res := db.Model(s).Where("Name = ?", s.Name).Update("status", s.Status); res.Error != nil {
 			return db, nil
 		}
-		return db.Where("Name = ?", s.Name).First(s), nil
+		m := new(Media)
+		r := db.Where("Name = ?", s.Name).First(m)
+		s = m
+		return r, nil
 	}
 	return nil, fmt.Errorf("wrong status")
 }

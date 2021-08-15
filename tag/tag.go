@@ -56,7 +56,10 @@ type Tag struct {
 //     schema:
 //       "$ref": "#/definitions/ErrResponse"
 func (s *Tag) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
-	return db.Where("Name = ?", c.Params("id")).First(s), nil
+	tag := new(Tag)
+	res := db.Where("Name = ?", c.Params("id")).First(tag)
+	*s = *tag
+	return res, nil
 }
 
 // swagger:operation POST /tag Tag CreateTag
