@@ -89,7 +89,7 @@ func Test_GET_Tag(t *testing.T) {
 	tester.Create(urlOne, &data, nil)
 
 	var result Tag
-	resp, err := tester.Retrieve(urlOne+"/test", &result)
+	resp, err := tester.Retrieve(urlOne+"/test3", &result)
 
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
