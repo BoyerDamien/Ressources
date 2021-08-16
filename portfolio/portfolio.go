@@ -39,7 +39,17 @@ type PortFolio struct {
 }
 
 func (s *PortFolio) BeforeCreate(tx *database.DB) error {
+	if err := gapi.Validate(s); err != nil {
+		return err
+	}
 	s.Gallery = []media.Media{}
+	return nil
+}
+
+func (s *PortFolio) BeforeUpdate(tx *database.DB) error {
+	if err := gapi.Validate(s); err != nil {
+		return err
+	}
 	return nil
 }
 

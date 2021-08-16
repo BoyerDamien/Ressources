@@ -53,15 +53,15 @@ type User struct {
 }
 
 func (s *User) BeforeCreate(tx *database.DB) error {
-	if len(s.Password) > 0 {
-		bytes, err := bcrypt.GenerateFromPassword([]byte(s.Password), bcrypt.MinCost)
-		if err != nil {
-			return err
-		}
-		s.Password = string(bytes)
-		return nil
+	if err := gapi.Validate(s); err != nil {
+		return err
 	}
-	return fmt.Errorf("no password")
+	bytes, err := bcrypt.GenerateFromPassword([]byte(s.Password), bcrypt.MinCost)
+	if err != nil {
+		return err
+	}
+	s.Password = string(bytes)
+	return nil
 }
 
 func (s *User) AfterCreate(tx *database.DB) (err error) {
@@ -80,10 +80,7 @@ func (s *User) AfterUpdate(tx *database.DB) (err error) {
 }
 
 func (s *User) BeforeUpdate(tx *database.DB) error {
-	if len(s.Password) > 0 {
-		return s.BeforeCreate(tx)
-	}
-	return nil
+	return s.BeforeCreate(tx)
 }
 
 // swagger:operation GET /user/{id} User RetrieveUser

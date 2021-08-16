@@ -1,7 +1,6 @@
 package offer
 
 import (
-	// "fmt"
 	"time"
 
 	"github.com/BoyerDamien/gapi"
@@ -28,6 +27,17 @@ type Offer struct {
 	// Tags liés l'offre
 	// required: true
 	Tags []tag.Tag `json:"tags" gorm:"many2many:offer_tags;constraint:OnUpdate:CASCADE;References:Name" validate:"required,dive"`
+}
+
+func (s *Offer) BeforeCreate(tx *database.DB) error {
+	if err := gapi.Validate(s); err != nil {
+		err
+	}
+	return nil
+}
+
+func (s *Offer) BeforeUpdate(tx *database.DB) error {
+	return s.BeforeCreate(tx)
 }
 
 func (s *Offer) Retrieve(c *gapi.Ctx, db *database.DB) (*database.DB, error) {

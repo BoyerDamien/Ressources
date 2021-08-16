@@ -21,6 +21,17 @@ type Tag struct {
 	Name string `json:"name" validate:"required,min=3,max=255" gorm:"primaryKey"`
 }
 
+func (s *Tag) BeforeUpdate(tx *database.DB) error {
+	if err := gapi.Validate(s); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Tag) BeforeCreate(tx *database.DB) error {
+	return s.BeforeUpdate(tx)
+}
+
 // swagger:operation GET /tag/{id} Tag RetrieveTag
 //
 // Retourne des informations détaillées sur un tag

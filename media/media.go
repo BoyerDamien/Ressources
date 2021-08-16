@@ -17,7 +17,7 @@ type Media struct {
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 
-	Path string `json:"-"`
+	Path string `json:"-" validate:"required"`
 
 	// Nom du média
 	// required: true
@@ -28,23 +28,23 @@ type Media struct {
 	// required: true
 	// min: 1
 	// example: 140
-	Size uint `json:"file_size"`
+	Size uint `json:"file_size" validate:"required"`
 
 	// Mime type du fichier
 	// required: true
 	// example: png
-	Type string `json:"type"`
+	Type string `json:"type" validate:"required"`
 
 	// Url du fichier
 	// required: false
 	// example: /chemin/vers/le/fichier.png
-	Url string `json:"url"`
+	Url string `json:"url" validate:"required"`
 
 	// Status du l'image
 	// required: true
 	// pattern: " protected | open"
 	// example: open
-	Status string `json:"status"`
+	Status string `json:"status" validate:"required,eq=protected|eq=open"`
 }
 
 func (s *Media) AfterDelete(tx *database.DB) (err error) {
@@ -60,6 +60,9 @@ func (s *Media) AfterFind(tx *database.DB) (err error) {
 }
 
 func (s *Media) BeforeCreate(tx *database.DB) error {
+	if err := gapi.Validate(s); err != nil {
+		return err
+	}
 	s.Path = path.Join(os.Getenv("MEDIA_PATH"), s.Name)
 	return s.AfterFind(tx)
 }
