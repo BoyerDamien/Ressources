@@ -341,7 +341,6 @@ func Test_DELETE_PortFolio(t *testing.T) {
  ****************************************************************************/
 
 func Test_GET_PortFolio_List(t *testing.T) {
-
 	data := []PortFolio{
 		{
 			Name:        "test1",
@@ -405,5 +404,72 @@ func Test_GET_PortFolio_List(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, 2, len(all2))
 	utils.AssertEqual(t, data[2].Name, all2[0].Name)
+}
 
+/*****************************************************************************
+ *			Test DELETE list Routes
+ ****************************************************************************/
+
+func Test_DELETE_PortFolio_List(t *testing.T) {
+	data := []PortFolio{
+		{
+			Name:        "test1",
+			Description: "test4",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test1",
+				},
+			},
+			Website: "https://changed.com",
+		},
+		{
+			Name:        "test2",
+			Description: "test3",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test2",
+				},
+			},
+			Website: "https://test2.com",
+		},
+		{
+			Name:        "test3",
+			Description: "test2",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test2",
+				},
+			},
+			Website: "https://test3.com",
+		},
+		{
+			Name:        "test4",
+			Description: "test1",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test1",
+				},
+			},
+			Website: "https://test4.com",
+		},
+	}
+	for _, val := range data {
+		tester.Create(urlOne, &val, nil)
+	}
+
+	endpoint := urlList + "?names=test1,test2,test3,test4"
+	resp, err := app.Test(httptest.NewRequest("DELETE", endpoint, nil))
+
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	var result2 []PortFolio
+	resp, err = tester.Retrieve(urlList+"?toFind=test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 0, len(result2), "Size")
 }
