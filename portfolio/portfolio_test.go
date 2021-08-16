@@ -138,6 +138,7 @@ func Test_POST_PortFolio_without_tag(t *testing.T) {
 /*****************************************************************************
  *			Test retrieve routes
  ****************************************************************************/
+
 func Test_GET_PortFolio(t *testing.T) {
 	data := PortFolio{
 		Name:        "test",
@@ -167,6 +168,7 @@ func Test_GET_PortFolio(t *testing.T) {
 /*****************************************************************************
  *			Test Update Routes
  ****************************************************************************/
+
 func Test_PUT_PortFolio_simple(t *testing.T) {
 	data := PortFolio{
 		Name:        "test",
@@ -304,7 +306,8 @@ func Test_PUT_PortFolio_Wrong_Gallery(t *testing.T) {
 /*****************************************************************************
  *			Test Delete Routes
  ****************************************************************************/
-func Test_DELETE_User(t *testing.T) {
+
+func Test_DELETE_PortFolio(t *testing.T) {
 	var mediaResult media.Media
 	resp, err := tester.CreateForm(fmt.Sprintf("%s/media", url), "../testFile2.json", "media", &mediaResult)
 	utils.AssertEqual(t, nil, err, "app.Test")
@@ -331,4 +334,76 @@ func Test_DELETE_User(t *testing.T) {
 	resp, err = tester.Retrieve(urlOne+"/test", &result2)
 	utils.AssertEqual(t, nil, err, "app.Test")
 	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
+}
+
+/*****************************************************************************
+ *			Test GET list Routes
+ ****************************************************************************/
+
+func Test_GET_PortFolio_List(t *testing.T) {
+
+	data := []PortFolio{
+		{
+			Name:        "test1",
+			Description: "test4",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test1",
+				},
+			},
+			Website: "https://changed.com",
+		},
+		{
+			Name:        "test2",
+			Description: "test3",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test2",
+				},
+			},
+			Website: "https://test2.com",
+		},
+		{
+			Name:        "test3",
+			Description: "test2",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test2",
+				},
+			},
+			Website: "https://test3.com",
+		},
+		{
+			Name:        "test4",
+			Description: "test1",
+			Gallery:     []media.Media{},
+			Tags: []tag.Tag{
+				{
+					Name: "test1",
+				},
+			},
+			Website: "https://test4.com",
+		},
+	}
+	for _, val := range data {
+		tester.Create(urlOne, &val, nil)
+	}
+
+	var all []PortFolio
+	resp, err := tester.Retrieve(urlList+"?orderBy=name&toFind=4", &all)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 2, len(all))
+	utils.AssertEqual(t, data[0].Name, all[0].Name)
+
+	var all2 []PortFolio
+	resp, err = tester.Retrieve(urlList+"?orderBy=name&limit=3&offset=2", &all2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, 2, len(all2))
+	utils.AssertEqual(t, data[2].Name, all2[0].Name)
+
 }
