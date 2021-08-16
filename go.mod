@@ -3,7 +3,7 @@ module github.com/BoyerDamien/ressources
 go 1.16
 
 require (
-	github.com/BoyerDamien/gapi v0.0.0-20210816162005-3d9cf18c09b7
+	github.com/BoyerDamien/gapi v0.0.0-20210816164514-a155d07453a5
 	github.com/andybalholm/brotli v1.0.3 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/gofiber/fiber/v2 v2.17.0

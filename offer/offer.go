@@ -31,7 +31,7 @@ type Offer struct {
 
 func (s *Offer) BeforeCreate(tx *database.DB) error {
 	if err := gapi.Validate(s); err != nil {
-		err
+		return err
 	}
 	return nil
 }
