@@ -271,3 +271,64 @@ func Test_PUT_PortFolio_Gallery(t *testing.T) {
 	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
 	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result3), "Value")
 }
+
+func Test_PUT_PortFolio_Wrong_Gallery(t *testing.T) {
+	data := PortFolio{
+		Name:        "test2",
+		Description: "Changed",
+		Gallery:     []media.Media{},
+		Tags: []tag.Tag{
+			{
+				Name: "test",
+			},
+		},
+		Website: "https://changed.com",
+	}
+
+	var result PortFolio
+	resp, err := tester.Create(urlOne, &data, &result)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+	utils.AssertEqual(t, testUtils.ModelToString(data), testUtils.ModelToString(result), "Value")
+
+	var result2 PortFolio
+	data.Gallery = append(data.Gallery, media.Media{
+		Name: "wrongMedia",
+		Path: "wrongMedia",
+	})
+	resp, err = tester.Update(urlOne, &data, &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusBadRequest, resp.StatusCode, "Status code")
+}
+
+/*****************************************************************************
+ *			Test Delete Routes
+ ****************************************************************************/
+func Test_DELETE_User(t *testing.T) {
+	var mediaResult media.Media
+	resp, err := tester.CreateForm(fmt.Sprintf("%s/media", url), "../testFile2.json", "media", &mediaResult)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	data := PortFolio{
+		Name:        "test",
+		Description: "Changed",
+		Gallery:     []media.Media{},
+		Tags: []tag.Tag{
+			{
+				Name: "test",
+			},
+		},
+		Website: "https://changed.com",
+	}
+	tester.Create(urlOne, &data, nil)
+
+	resp, err = app.Test(httptest.NewRequest("DELETE", fmt.Sprintf("%s/test", urlOne), nil))
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusOK, resp.StatusCode, "Status code")
+
+	var result2 PortFolio
+	resp, err = tester.Retrieve(urlOne+"/test", &result2)
+	utils.AssertEqual(t, nil, err, "app.Test")
+	utils.AssertEqual(t, fiber.StatusNotFound, resp.StatusCode, "Status code")
+}
