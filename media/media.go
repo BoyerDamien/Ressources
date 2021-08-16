@@ -52,11 +52,16 @@ func (s *Media) AfterDelete(tx *database.DB) (err error) {
 	return
 }
 
-func (s *Media) BeforeFind(tx *database.DB) (err error) {
+func (s *Media) AfterFind(tx *database.DB) (err error) {
 	if _, err := os.Stat(s.Path); os.IsNotExist(err) {
 		return fmt.Errorf("no such file or directory")
 	}
 	return
+}
+
+func (s *Media) BeforeCreate(tx *database.DB) error {
+	s.Path = path.Join(os.Getenv("MEDIA_PATH"), s.Name)
+	return s.AfterFind(tx)
 }
 
 // swagger:operation GET /media/{id} Media RetrieveMedia
@@ -189,14 +194,15 @@ func (s *Media) Create(c *gapi.Ctx, db *database.DB) (*database.DB, error) {
 	s.Url = path.Join(os.Getenv("STATIC_FILES_MEDIA_URL"), media.Filename)
 	s.Status = "protected"
 
+	if err := c.SaveFile(media, s.Path); err != nil {
+		return nil, err
+	}
+
 	result := db.FirstOrCreate(s, Media{Name: s.Name})
 	if result.Error != nil {
 		return result, nil
 	}
 
-	if err := c.SaveFile(media, s.Path); err != nil {
-		return db.Where("Name = ?", s.Name).Delete(s), err
-	}
 	return result, nil
 }
 
